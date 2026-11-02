@@ -1,0 +1,5 @@
+package-as: PintsThreatMeter
+
+manual-changelog:
+  filename: CHANGELOG.txt
+  markup-type: plain

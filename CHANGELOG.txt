@@ -1,0 +1,6 @@
+Pint's Threat Meter - Changelog
+
+v1.1
+- First public release as Pint's Threat Meter.
+- Group threat on your target with you always shown, pull bar, time to pull, threat per second,
+  scaled or raw percent, healer mode, tank mode, warnings with sound and flash.
