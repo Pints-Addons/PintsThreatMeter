@@ -1,5 +1,8 @@
 Pint's Threat Meter - Changelog
 
+v1.2.2
+- WoW Forever: fixed a flood of errors in combat when the game hides who a mob or player is.
+
 v1.2.1
 - WoW Forever: characters are known by their full name (first and second, e.g. "Pint Waterboy"), so characters that
   share a first name no longer share one record. Classic Era is unchanged.

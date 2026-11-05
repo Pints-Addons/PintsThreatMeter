@@ -109,12 +109,15 @@ local function Read()
 	mobName = mob and UnitName(mob)
 	if not mob then return end
 	local guid = UnitGUID(mob)
+	-- the modern client can hide GUIDs in combat (secret values): fall back to the unit token as the key
+	if Hidden(guid) then guid = "unit:" .. mob end
 	if guid ~= lastMob then wipe(history); lastMob = guid end
 	local now, seen = GetTime(), {}
 	local tank
 	for _, u in ipairs(units) do
 		if UnitExists(u) then
 			local g = UnitGUID(u)
+			if Hidden(g) then g = "unit:" .. u end
 			if g and not seen[g] then
 				seen[g] = true
 				local isTanking, status, scaled, raw, value = UnitDetailedThreatSituation(u, mob)
