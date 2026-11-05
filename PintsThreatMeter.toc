@@ -2,7 +2,7 @@
 ## Title: |cffd4a017Pint's|r Threat Meter
 ## Notes: Threat meter: your group's threat on your target, you always shown, the threat needed to pull aggro, threat per second and time to pull, warnings, healer and tank modes. /pth
 ## Author: Jake (Pint's Add-ons, built with Claude)
-## Version: 1.1
+## Version: 1.2
 ## X-Curse-Project-ID: 1779430
 ## IconTexture: Interface\Icons\Ability_Defend
 ## OptionalDeps: LibDBIcon-1.0

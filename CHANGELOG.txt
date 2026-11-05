@@ -1,5 +1,10 @@
 Pint's Threat Meter - Changelog
 
+v1.2
+- Works on WoW Forever (the modern game client). Classic Era is unchanged.
+- Threat or buffs the game keeps hidden are skipped instead of causing errors.
+- Tank detection remembers your last known state when the game hides it in combat.
+
 v1.1
 - First public release as Pint's Threat Meter.
 - Group threat on your target with you always shown, pull bar, time to pull, threat per second,

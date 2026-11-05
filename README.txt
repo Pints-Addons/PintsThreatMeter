@@ -40,3 +40,7 @@ COMMANDS
 
 Pint's Threat Meter - by Jake (Pint's Add-ons), built with Claude. Original code.
 World of Warcraft names and game data are the property of Blizzard Entertainment.
+
+FEEDBACK
+  Report a bug or suggest an idea: https://github.com/Pints-Addons/PintsThreatMeter/issues
+  Source code: https://github.com/Pints-Addons/PintsThreatMeter

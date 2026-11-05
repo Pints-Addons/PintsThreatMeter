@@ -1,6 +1,9 @@
 -- Pint's Threat Meter: a threat meter. Everyone in your group on your target's threat list, with you always shown,
 -- the threat needed to pull aggro, threat per second and time to pull, warnings, healer and tank modes.  /pth
 local ADDON = ...
+-- Compatibility: WoW Forever runs on the modern game client, where these older functions moved or were renamed.
+local IsAddOnLoaded = IsAddOnLoaded or (C_AddOns and C_AddOns.IsAddOnLoaded)
+
 local PTH = {}
 _G.PintsThreat = PTH
 
@@ -35,22 +38,34 @@ local function ClassRGB(unit)
 	if cc then return cc.r, cc.g, cc.b end
 	return 0.6, 0.6, 0.6
 end
+local function Hidden(v) return type(issecretvalue) == "function" and issecretvalue(v) end
+-- true / false, or nil when the game hides buffs right now (in combat on the modern client)
 local function HasBuff(unit, names)
 	for i = 1, 40 do
 		local n
 		if UnitBuff then n = UnitBuff(unit, i)
-		elseif C_UnitAuras and C_UnitAuras.GetBuffDataByIndex then local a = C_UnitAuras.GetBuffDataByIndex(unit, i); n = a and a.name end
+		elseif C_UnitAuras and C_UnitAuras.GetBuffDataByIndex then
+			local ok, a = pcall(C_UnitAuras.GetBuffDataByIndex, unit, i)
+			if not ok or Hidden(a) then return nil end
+			n = a and a.name
+		end
+		if Hidden(n) then return nil end
 		if not n then return false end
 		if names[n] then return true end
 	end
 	return false
 end
 local TANK_BUFFS = { ["Bear Form"] = true, ["Dire Bear Form"] = true, ["Righteous Fury"] = true }
+local IAmTankKnown = false
 local function IAmTank()
 	if db.tankMode == "on" then return true elseif db.tankMode == "off" then return false end
 	local _, class = UnitClass("player")
 	if class == "WARRIOR" then return GetShapeshiftForm() == 2 end
-	if class == "DRUID" or class == "PALADIN" then return HasBuff("player", TANK_BUFFS) end
+	if class == "DRUID" or class == "PALADIN" then
+		local r = HasBuff("player", TANK_BUFFS)
+		if r ~= nil then IAmTankKnown = r end
+		return IAmTankKnown or false
+	end
 	return false
 end
 
@@ -103,11 +118,13 @@ local function Read()
 			if g and not seen[g] then
 				seen[g] = true
 				local isTanking, status, scaled, raw, value = UnitDetailedThreatSituation(u, mob)
+				-- the modern client may hide other people's threat: skip anyone it won't tell us about
+				if Hidden(isTanking) or Hidden(scaled) or Hidden(raw) or Hidden(value) then value = nil end
 				if value and (value > 0 or u == "player" or isTanking) then
 					value = value / 100
 					Track(g, value, now)
 					local r = { unit = u, guid = g, name = UnitName(u), tanking = isTanking, status = status, scaled = scaled or 0, raw = raw or 0, value = value,
-						me = UnitIsUnit(u, "player"), pet = (u == "pet" or u:find("pet")) and true or false, tps = TPS(g) }
+						me = u == "player", pet = (u == "pet" or u:find("pet")) and true or false, tps = TPS(g) }
 					-- raw / scaled = what it takes to pull (1.1 in melee, 1.3 at range)
 					r.ranged = (r.scaled > 0 and r.raw / r.scaled > 1.2) or false
 					rows[#rows + 1] = r
