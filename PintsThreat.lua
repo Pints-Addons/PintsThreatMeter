@@ -136,7 +136,7 @@ local function Read()
 	-- you're always on the list, even with no threat yet
 	local haveMe = false
 	for _, r in ipairs(rows) do if r.me then haveMe = true end end
-	if not haveMe then rows[#rows + 1] = { unit = "player", guid = UnitGUID("player"), name = UnitName("player"), scaled = 0, raw = 0, value = 0, me = true, tps = 0 } end
+	if not haveMe then rows[#rows + 1] = { unit = "player", guid = UnitGUID("player"), name = (GetUnitName and GetUnitName("player", false) or UnitName("player")), scaled = 0, raw = 0, value = 0, me = true, tps = 0 } end
 	-- the threat you'd need to pull aggro
 	local me
 	for _, r in ipairs(rows) do if r.me then me = r end end

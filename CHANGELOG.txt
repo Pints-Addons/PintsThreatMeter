@@ -1,5 +1,9 @@
 Pint's Threat Meter - Changelog
 
+v1.2.1
+- WoW Forever: characters are known by their full name (first and second, e.g. "Pint Waterboy"), so characters that
+  share a first name no longer share one record. Classic Era is unchanged.
+
 v1.2
 - Works on WoW Forever (the modern game client). Classic Era is unchanged.
 - Threat or buffs the game keeps hidden are skipped instead of causing errors.
