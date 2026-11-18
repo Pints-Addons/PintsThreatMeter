@@ -1,5 +1,10 @@
 Pint's Threat Meter - Changelog
 
+v1.2.3
+- WoW Forever: hover a player's bar in the game's Damage Meter for what it came from, spell by spell (amount and
+  share). Hold Shift for it by mob. Works for whatever the meter window shows (damage, healing...). The game hides the
+  amounts during a fight, so the breakdown shows once it ends. /pth metertips turns it off or on.
+
 v1.2.2
 - WoW Forever: fixed a flood of errors in combat when the game hides who a mob or player is.
 
