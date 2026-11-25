@@ -1,5 +1,11 @@
 Pint's Threat Meter - Changelog
 
+v1.2.4
+- Everyone in your group gets a bar on the mob you're watching, at 0 until they've done something, so a tank sees
+  the others coming instead of only once they've built threat (pets show once they have some).
+- WoW Forever: when the game hides someone's threat in a fight they still get a bar - the game draws it and writes
+  their percent (100% = pulls aggro); they sit below the ones that can be read and sorted.
+
 v1.2.3
 - WoW Forever: hover a player's bar in the game's Damage Meter for what it came from, spell by spell (amount and
   share). Hold Shift for it by mob. Works for whatever the meter window shows (damage, healing...). The game hides the

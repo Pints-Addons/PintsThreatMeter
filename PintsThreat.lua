@@ -121,9 +121,18 @@ local function Read()
 			if g and not seen[g] then
 				seen[g] = true
 				local isTanking, status, scaled, raw, value = UnitDetailedThreatSituation(u, mob)
-				-- the modern client may hide other people's threat: skip anyone it won't tell us about
-				if Hidden(isTanking) or Hidden(scaled) or Hidden(raw) or Hidden(value) then value = nil end
-				if value and (value > 0 or u == "player" or isTanking) then
+				local isPet = (u == "pet" or u:find("pet")) and true or false
+				-- the modern client may hide other people's threat in a fight: they still get a bar - the game draws it and
+				-- writes its percent itself (we just can't sort by it, so they go below the ones we can read)
+				if Hidden(isTanking) or Hidden(scaled) or Hidden(raw) or Hidden(value) then
+					if not isPet then
+						rows[#rows + 1] = { unit = u, guid = g, name = UnitName(u), secret = true, sScaled = scaled, sRaw = raw, sValue = value,
+							tanking = (not Hidden(isTanking)) and isTanking or false, scaled = 0, raw = 0, value = -1, me = u == "player", pet = false, tps = 0 }
+					end
+					value = nil
+				end
+				-- everyone in the group shows (at 0 until they've done something), so you see them coming; pets only once they have threat
+				if value and (value > 0 or not isPet or isTanking) then
 					value = value / 100
 					Track(g, value, now)
 					local r = { unit = u, guid = g, name = UnitName(u), tanking = isTanking, status = status, scaled = scaled or 0, raw = raw or 0, value = value,
@@ -221,7 +230,12 @@ local function Draw()
 		local r, b = rows[i], Bar(i)
 		b:ClearAllPoints()
 		b:SetPoint("TOPLEFT", frame, "TOPLEFT", 4, -20 - (i - 1) * (h + 1)); b:SetSize(db.width - 8, h)
-		b:SetValue(top > 0 and (r.value / top) or (r.me and 0 or 0))
+		if r.secret then
+			-- (hidden numbers: the bar shows the scaled percent the game hands over, 100 = pulls aggro)
+			b:SetMinMaxValues(0, 100); pcall(b.SetValue, b, r.sScaled or 0)
+		else
+			b:SetMinMaxValues(0, 1); b:SetValue(top > 0 and (r.value / top) or 0)
+		end
 		local cr, cg, cb
 		if r.pullBar then cr, cg, cb = 0.85, 0.1, 0.1
 		elseif db.classColors and r.unit and not r.pet then cr, cg, cb = ClassRGB(r.unit)
@@ -239,10 +253,15 @@ local function Draw()
 		if r.me then nm = "|cffffffff" .. nm .. "|r" end
 		b.name:SetText(nm)
 		local pct = db.scaled and r.scaled or r.raw
-		b.pct:SetText(db.showPct and (r.pullBar and (db.scaled and "100%" or ("%d%%"):format(r.raw)) or ("%d%%"):format(math.floor(pct + 0.5))) or "")
+		if r.secret then
+			b.pct:SetText("")
+			if db.showPct then pcall(b.pct.SetFormattedText, b.pct, "%.0f%%", (db.scaled and r.sScaled or r.sRaw) or 0) end
+		else
+			b.pct:SetText(db.showPct and (r.pullBar and (db.scaled and "100%" or ("%d%%"):format(r.raw)) or ("%d%%"):format(math.floor(pct + 0.5))) or "")
+		end
 		local v = ""
-		if db.showValue then v = Short(r.value) end
-		if db.showTPS and not r.pullBar then v = v .. (v ~= "" and " " or "") .. "|cffaaaaaa" .. Short(r.tps) .. "/s|r" end
+		if db.showValue and not r.secret then v = Short(r.value) end
+		if db.showTPS and not r.pullBar and not r.secret then v = v .. (v ~= "" and " " or "") .. "|cffaaaaaa" .. Short(r.tps) .. "/s|r" end
 		b.val:SetText(v)
 		b.name:SetPoint("RIGHT", b.val, "LEFT", -4, 0)
 		if r.me then b.bg:SetColorTexture(0.25, 0.25, 0.25, 0.6) else b.bg:SetColorTexture(0, 0, 0, 0.45) end
